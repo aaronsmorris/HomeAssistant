@@ -1,0 +1,36 @@
+alias: HVAC  - Run HRV 20 min per hour
+description: Bring in outside air into house for 20m per hour at max CFM on the HRV
+trigger:
+  - platform: time_pattern
+    hours: /1
+condition:
+  - condition: or
+    conditions:
+      - condition: state
+        entity_id: sensor.pm25sensor_pm_2_5_aqi
+        state: unavailable
+      - condition: numeric_state
+        entity_id: sensor.pm25sensor_pm_2_5_aqi
+        below: 150
+action:
+  - type: turn_on
+    device_id: a35b825f8bc1d88786b8527a75d8a857
+    entity_id: switch.ovr
+    domain: switch
+    alias: Turn on HRV Override
+  - if:
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_a79e08_co2
+        above: 99.9
+        below: 900
+    then:
+      - delay:
+          hours: 0
+          minutes: 20
+          seconds: 0
+          milliseconds: 0
+      - type: turn_off
+        device_id: a35b825f8bc1d88786b8527a75d8a857
+        entity_id: 0ced3fc34fb0f9d3f0a93ec53000ba5c
+        domain: switch
+mode: single
